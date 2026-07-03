@@ -20,8 +20,7 @@ function App() {
     <>
     
       <div className="App">
-      {/* <Mainrouter/> */}
-        <Demo/>
+        <Mainrouter/>
       </div>
     </>
   );
