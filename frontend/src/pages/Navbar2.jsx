@@ -192,7 +192,7 @@ const showNav = () =>{
        
       </SimpleGrid>
       {
-          show && (<Menu/>)
+          show && (<Menu onClose={() => setShow(false)}/>)
         }
     </>
   );

@@ -5,24 +5,31 @@ import Navbutton from '../components/Navbutton'
 import Button1 from '../components/Button1'
 import Button2 from '../components/Button2'
 
-function Menu() {
+function Menu({ onClose }) {
   return (
     <>
 
       <Flex
-      display={{base:"grid",lg:"none"}}
-      direction="column"
-      justifyContent="end"
-      bg="unset"
-        >
+        display={{base:"flex",lg:"none"}}
+        direction="column"
+        position="absolute"
+        top="80px"
+        left="0px"
+        width="100%"
+        bg="#FFFFFF"
+        zIndex="999"
+        boxShadow="0px 8px 16px rgba(0, 0, 0, 0.1)"
+        padding="20px"
+        gap="10px"
+      >
 
-      <Link to="/"> <Navbutton d="grid" name="HOME" /></Link>
-        <Link to="/Yogasessions"><Navbutton d="grid" name="YOGA SESSION" /></Link>
-        <Link to="/YogaCourses"><Navbutton d="grid" name="YOGA COURSES" /></Link>
-        <Link to="/YogaForms"><Navbutton d="grid" name="YOGIC FORMS" /></Link>
-       <Link to="/Instructors"><Navbutton d="grid"  name="INSTRUCTORS" /></Link>
-       <Link to="/Contact"><Navbutton d="grid" name="CONTACT US" /></Link>
-       <Link to="/Profile"><Navbutton d="grid" name="PROFILE" /></Link>
+      <Link to="/" onClick={onClose}> <Navbutton d="grid" name="HOME" /></Link>
+        <Link to="/Yogasessions" onClick={onClose}><Navbutton d="grid" name="YOGA SESSION" /></Link>
+        <Link to="/YogaCourses" onClick={onClose}><Navbutton d="grid" name="YOGA COURSES" /></Link>
+        <Link to="/YogaForms" onClick={onClose}><Navbutton d="grid" name="YOGIC FORMS" /></Link>
+       <Link to="/Instructors" onClick={onClose}><Navbutton d="grid"  name="INSTRUCTORS" /></Link>
+       <Link to="/Contact" onClick={onClose}><Navbutton d="grid" name="CONTACT US" /></Link>
+       <Link to="/Profile" onClick={onClose}><Navbutton d="grid" name="PROFILE" /></Link>
 
         <Box
           width="155px"
@@ -31,7 +38,7 @@ function Menu() {
           justifyContent="center"
           d="grid"
         >
-      <Link to="/Login">   <Button1
+      <Link to="/Login" onClick={onClose}>   <Button1
             name="Login"
             bg="#285430"
             br="7.5px"
@@ -50,7 +57,7 @@ function Menu() {
           justifyContent="center"
           d="grid"
         >
-         <Link to="/Signup"><Button2
+         <Link to="/Signup" onClick={onClose}><Button2
             name="Sign up"
             bg="#D9D9D9"
             br="7.5px"
