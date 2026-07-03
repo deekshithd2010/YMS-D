@@ -17,6 +17,7 @@ function Button2(props) {
       fontStyle='normal'
       letterSpacing= '-2%'
         _hover={{ bg: "#9A9A9A", color: "#FFFFFF" }}
+        onClick={props.onClick}
       >
         {props.name}
       </Button>

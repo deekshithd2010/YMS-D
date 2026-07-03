@@ -1,67 +1,123 @@
 import { MinusIcon } from '@chakra-ui/icons'
-import { Card, Flex, HStack, VStack } from '@chakra-ui/react'
-import React from 'react'
+import { Card, Flex, HStack, VStack, Box } from '@chakra-ui/react'
+import React, { useState, useEffect } from 'react'
 import TP1 from '../components/TP1'
 import TextP from '../components/TextP'
+import Sessionstudinfo from '../components/Sessionstudinfo'
+import axios from 'axios'
+
 function Admin2() {
+  const [students, setStudents] = useState([]);
+  const [tab, setTab] = useState("sessions"); // "sessions" or "courses"
+  
+  const token = localStorage.getItem("token") || localStorage.getItem("accessToken");
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const fetchStudents = async () => {
+    try {
+      // Use public endpoint ymsapi/stu_list/ or authenticated /students/
+      const response = await axios.get('/ymsapi/stu_list/');
+      setStudents(response.data || []);
+    } catch (error) {
+      console.error("Error fetching student list:", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this student record?")) {
+      return;
+    }
+    try {
+      await axios.delete(`/ymsapi/students/${id}/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Student deleted successfully.");
+      // Refresh list
+      fetchStudents();
+    } catch (error) {
+      console.error(error);
+      alert("Error deleting student.");
+    }
+  };
+
+  // Filter students based on active tab selection
+  // In our schema, session registrations have batch_timing, courses have course code.
+  const filteredStudents = students.filter(s => {
+    if (tab === "sessions") {
+      return !!s.batch_timing;
+    } else {
+      return !!s.course;
+    }
+  });
+
   return (
     <>
-      <Flex
-    columns={2}
-    >
-      <Flex
-        bg="#285430"
-        h="1000px"
-        w={{ base: "300px", sm:"200px", lg: "300px" }}
-        // paddingTop={{ base: "80px", lg: "160px" }}
-        paddingBottom={{ base: "900px", lg: "360px" }}
-        paddingInline={{ base: "10px", lg: "90px" }}
-        alignItems="center"
-        justifyContent="center"
-      >
-        <VStack gap="45px">
-          <TP1
-            heading="Edit Students"
-            fs={{ base:"12px", lg:"16px" }}
-            lh={{ base:"16px", lg:"26px" }}
-            al="center"
-            c="#FFFFFF"
-            fw={{ base: 300, lg: 500 }}
-          />
-           
-           <TP1
-            heading="Add Students"
-            fs={{ base:"12px", lg:"16px" }}
-            lh={{ base:"16px", lg:"26px" }}
-            al="center"
-            c="#FFFFFF"
-            fw={{ base: 300, lg: 500 }}
-          />
-     
-        </VStack>
-      </Flex>
-      <Flex >
-        <VStack gap="40px">
-        <HStack alignSelf="start" margin="20px">
-       <Card w="150px" h="40px" border= "0.5px solid #000000" alignItems="center" justifyContent="center">
-        Yoga Sessions
-       </Card>
-       <Card w="150px" h="40px" border= "0.5px solid #000000" alignItems="center" justifyContent="center">
-        Yoga Courses
-       </Card>
-       </HStack>
-       <HStack gap="100px" display={{base:"none", lg:"flex"}} paddingLeft="20px">
-       <TextP heading="Name" fw="500" fs="20px" lh="28px" al="center" />
-       <TextP heading="Fees Status" fw="500" fs="20px" lh="28px" al="center" />
-       <TextP heading="Batch Timings" fw="500" fs="20px" lh="28px" al="center" />
-       <TextP heading="Email" fw="500" fs="20px" lh="28px" al="center" />
-       <TextP heading="Subscription" fw="500" fs="20px" lh="28px" al="center" />
-       </HStack>
-       <MinusIcon w="full" h="3px" bg="#000000" opacity="30%" alignSelf="center" display={{base:"none", lg:"flex"}} />
-       </VStack>
-      </Flex>
+      <VStack gap="20px" width="100%" align="stretch">
+        <HStack alignSelf="start" marginBlock="20px" gap="20px">
+          <Card 
+            w="150px" 
+            h="40px" 
+            border="0.5px solid #000000" 
+            alignItems="center" 
+            justifyContent="center"
+            cursor="pointer"
+            bg={tab === "sessions" ? "#285430" : "#FFFFFF"}
+            color={tab === "sessions" ? "#FFFFFF" : "#000000"}
+            onClick={() => setTab("sessions")}
+          >
+            Yoga Sessions
+          </Card>
+          <Card 
+            w="150px" 
+            h="40px" 
+            border="0.5px solid #000000" 
+            alignItems="center" 
+            justifyContent="center"
+            cursor="pointer"
+            bg={tab === "courses" ? "#285430" : "#FFFFFF"}
+            color={tab === "courses" ? "#FFFFFF" : "#000000"}
+            onClick={() => setTab("courses")}
+          >
+            Yoga Courses
+          </Card>
+        </HStack>
 
-      </Flex>
+        {/* Table Header */}
+        <HStack gap="100px" display={{base:"none", lg:"flex"}} paddingLeft="20px">
+          <TextP heading="Name" fw="500" fs="20px" lh="28px" al="center" />
+          <TextP heading="Fees Status" fw="500" fs="20px" lh="28px" al="center" />
+          <TextP heading={tab === "sessions" ? "Batch Timings" : "Course Code"} fw="500" fs="20px" lh="28px" al="center" />
+          <TextP heading="Email" fw="500" fs="20px" lh="28px" al="center" />
+          <TextP heading="Subscription" fw="500" fs="20px" lh="28px" al="center" />
+        </HStack>
+
+        <MinusIcon w="full" h="3px" bg="#000000" opacity="30%" alignSelf="center" display={{base:"none", lg:"flex"}} />
+
+        {/* Dynamic Table Rows */}
+        <VStack gap="15px" width="100%" align="stretch">
+          {filteredStudents.length > 0 ? (
+            filteredStudents.map(student => (
+              <Sessionstudinfo
+                key={student.id}
+                id={student.id}
+                name={student.name}
+                email={student.email}
+                feesStatus={student.fees_status}
+                batchTiming={tab === "sessions" ? student.batch_timing : student.course}
+                subscription={student.subscription_type || "Monthly"}
+                onDelete={handleDelete}
+              />
+            ))
+          ) : (
+            <Box padding="30px" textAlign="center" bg="#FFFFFF" borderRadius="5px">
+              No students enrolled in this category yet.
+            </Box>
+          )}
+        </VStack>
+      </VStack>
     </>
   )
 }

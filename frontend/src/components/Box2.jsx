@@ -4,29 +4,43 @@ import { Flex, HStack, IconButton, SimpleGrid } from "@chakra-ui/react";
 import { EditIcon } from '@chakra-ui/icons'
 import TextP from "./TextP";
 import Pending1 from "./Pending1";
+import Paid from "./Paid";
+
 function Box2(props) {
+  const isPaid = props.paymentStatus?.toLowerCase() === "paid";
+
   return (
-    <div>
+    <div style={{ marginBottom: "15px" }}>
       <Flex
-        w={{ base: "300px", sm:"600px", lg: "800px" }}
-        h={{base:"200px", lg:"50px"}}
+        w={{ base: "300px", sm: "600px", lg: "800px" }}
+        h={{ base: "auto", lg: "50px" }}
         border="0.6px solid #000000"
+        borderRadius="5px"
         justifyContent="space-evenly"
+        padding="5px"
       >
-        <SimpleGrid columns={{base:1, lg:3}} marginBlock="5px" alignItems="center" justifyItems="center" columnGap="50px">
-          <TextP heading="6 : 00 AM - 7 : 00 Am" fw="300" fs="16px" lh="28px"  />
+        <SimpleGrid
+          columns={{ base: 1, lg: 3 }}
+          marginBlock="5px"
+          alignItems="center"
+          justifyItems="center"
+          columnGap="50px"
+          width="100%"
+        >
+          <TextP heading={props.batchTime || "Timing not specified"} fw="300" fs="16px" lh="28px" />
           <HStack>
-            <TextP heading="Change Timing" fw="300" fs="16px" lh="28px"  />
-            <IconButton 
-            icon={<EditIcon/>} alignSelf="center" />
+            <TextP heading="Registered" fw="400" fs="16px" lh="28px" />
           </HStack>
-          <Pending1 />
-          </SimpleGrid>
-                </Flex>
+          {isPaid ? <Paid /> : <Pending1 />}
+        </SimpleGrid>
+      </Flex>
     </div>
   );
 }
 
-Box2.propTypes = {};
+Box2.propTypes = {
+  batchTime: PropTypes.string,
+  paymentStatus: PropTypes.string,
+};
 
 export default Box2;

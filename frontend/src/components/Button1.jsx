@@ -20,6 +20,7 @@ function Button1(props) {
         _hover={{ bg: "#CEEDC7", color: "#000000" }}
         type={props.type}
         onSubmit={props.onSubmit}
+        onClick={props.onClick}
       >
         {props.name}
       </Button>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import TextP from "../components/TextP";
 import Textbox2 from "../components/Textbox2";
 import Button1 from "../components/Button1";
@@ -11,20 +11,115 @@ import {
   VStack,
   Box,
   Spacer,
-  Card,
 } from "@chakra-ui/react";
 import Pic from "../components/Pic";
 import Yogaprofile from "./Yogaprofile";
 import TextC from "../components/TextC";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 function Profile() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [dob, setDob] = useState("");
+  const [gender, setGender] = useState(""); // "Male" or "Female"
+  const [address, setAddress] = useState("");
+  const [pincode, setPincode] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  
+  // Registration lists for Yogaprofile
+  const [sessions, setSessions] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("token") || localStorage.getItem("accessToken");
+
+  useEffect(() => {
+    if (!token) {
+      alert("Please login to view your profile.");
+      navigate("/Login");
+      return;
+    }
+    fetchProfileData();
+    fetchEnrollmentData();
+  }, [token]);
+
+  const fetchProfileData = async () => {
+    try {
+      const response = await axios.get("/ymsapi/profile/", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = response.data;
+      setName(data.name || "");
+      setEmail(data.email || "");
+      setDob(data.dob || "");
+      setGender(data.gender || "");
+      setAddress(data.address || "");
+      setPincode(data.pincode || "");
+      setCity(data.city || "");
+      setState(data.state || "");
+    } catch (error) {
+      console.error(error);
+      if (error.response?.status === 401) {
+        localStorage.clear();
+        navigate("/Login");
+      }
+    }
+  };
+
+  const fetchEnrollmentData = async () => {
+    try {
+      const response = await axios.get("/ymsapi/yoga-profile/", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSessions(response.data.sessions || []);
+      setCourses(response.data.courses || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleGenderChange = (selectedGender) => {
+    if (!isEditing) return;
+    setGender(selectedGender);
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await axios.put(
+        "/ymsapi/profile/",
+        {
+          name,
+          email,
+          dob,
+          gender,
+          address,
+          pincode,
+          city,
+          state
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      alert("Profile updated successfully!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error(error);
+      alert("Error saving profile details.");
+    }
+  };
+
   return (
     <>
       <TextC
-        heading="PERESNOL PROFILE"
+        heading="PERSONAL PROFILE"
         fs={{ base: 24, sm: 28, lg: 48 }}
         lh="65px"
         fw={{ base: 700, lg: 500 }}
-        al ="center"
+        al="center"
         pt="30px"
       />
       <Flex w="100%" h="100%" bg="#F6F6F6">
@@ -36,7 +131,8 @@ function Profile() {
           borderRadius="10px"
           boxSizing="border-box"
           marginBottom="80px"
-          marginInline={{ base: "0px", sm: "150px", lg: "200" }}
+          marginInline={{ base: "0px", sm: "150px", lg: "200px" }}
+          padding="20px"
         >
           <SimpleGrid
             justifyItems="center"
@@ -45,26 +141,51 @@ function Profile() {
             rowGap="30px"
             paddingBlock={{ base: "30px", sm: "50px" }}
             paddingInline={{ base: "30px", sm: "65px" }}
+            width="100%"
           >
             <Pic
               w="130px"
               h="130px"
-              src="public\images\profile.jpg"
+              src="\images\profile.jpg"
               br="100%"
             />
 
-            <VStack gap="10px">
-              <div>
+            <VStack gap="10px" width="100%">
+              <div style={{ width: '100%' }}>
                 <TextP heading="Name" fw="400" fs="16px" lh="24px" />
-                <Textbox2 w="300px" h="48px" ty="text" ph="Name" />
+                <Textbox2
+                  w="100%"
+                  h="48px"
+                  ty="text"
+                  ph="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={!isEditing}
+                />
               </div>
-              <div>
+              <div style={{ width: '100%' }}>
                 <TextP heading="Email" fw="400" fs="16px" lh="24px" />
-                <Textbox2 w="300px" h="48px" ty="text" ph="Email" />
+                <Textbox2
+                  w="100%"
+                  h="48px"
+                  ty="text"
+                  ph="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={!isEditing}
+                />
               </div>
-              <div>
+              <div style={{ width: '100%' }}>
                 <TextP heading="DOB" fw="400" fs="16px" lh="24px" />
-                <Textbox2 w="300px" h="48px" ty="text" ph="DOB" />
+                <Textbox2
+                  w="100%"
+                  h="48px"
+                  ty="text"
+                  ph="DOB"
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
+                  disabled={!isEditing}
+                />
               </div>
               <Box justifyContent="left" w="100%">
                 <TextP
@@ -74,52 +195,105 @@ function Profile() {
                   lh="24px"
                   al="left"
                 />
-                <VStack align="left">
-                  <Check cs="green" title="Male" />
-                  <Check cs="green" title="Female" />
-                </VStack>
+                <HStack align="left" gap="20px">
+                  <Check
+                    cs="green"
+                    title="Male"
+                    isChecked={gender === "Male"}
+                    onChange={() => handleGenderChange("Male")}
+                    disabled={!isEditing}
+                  />
+                  <Check
+                    cs="green"
+                    title="Female"
+                    isChecked={gender === "Female"}
+                    onChange={() => handleGenderChange("Female")}
+                    disabled={!isEditing}
+                  />
+                </HStack>
               </Box>
-              <div>
+              <div style={{ width: '100%' }}>
                 <TextP heading="Address" fw="400" fs="16px" lh="24px" />
-                <Textbox2 w="300px" h="48px" ty="text" ph="Address" />
+                <Textbox2
+                  w="100%"
+                  h="48px"
+                  ty="text"
+                  ph="Address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  disabled={!isEditing}
+                />
               </div>
-              <div>
+              <div style={{ width: '100%' }}>
                 <TextP heading="Pincode" fw="400" fs="16px" lh="24px" />
-                <Textbox2 w="300px" h="48px" ty="text" ph="Pincode" />
+                <Textbox2
+                  w="100%"
+                  h="48px"
+                  ty="text"
+                  ph="Pincode"
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value)}
+                  disabled={!isEditing}
+                />
               </div>
             </VStack>
-            <VStack gap="10px">
-              <Spacer />
-              <div>
+            
+            <VStack gap="10px" width="100%">
+              <div style={{ width: '100%' }}>
                 <TextP heading="City" fw="400" fs="16px" lh="24px" />
-                <Textbox2 w="300px" h="48px" ty="text" ph="City" />
+                <Textbox2
+                  w="100%"
+                  h="48px"
+                  ty="text"
+                  ph="City"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  disabled={!isEditing}
+                />
               </div>
-              <div>
+              <div style={{ width: '100%' }}>
                 <TextP heading="State" fw="400" fs="16px" lh="24px" />
-                <Textbox2 w="300px" h="48px" ty="text" ph="State" />
+                <Textbox2
+                  w="100%"
+                  h="48px"
+                  ty="text"
+                  ph="State"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  disabled={!isEditing}
+                />
               </div>
+              <Spacer />
             </VStack>
           </SimpleGrid>
+
           <HStack
             gap="30px"
             paddingBottom="30px"
             paddingInline="45px"
             justifyContent="end"
           >
-            <Button1 name="Edit" h="48px" w="130px" />
-            <Button2 name="Save" h="48px" w="130px" />
+            {isEditing ? (
+              <>
+                <Button2 name="Cancel" h="48px" w="130px" onClick={() => { setIsEditing(false); fetchProfileData(); }} />
+                <Button1 name="Save" h="48px" w="130px" onClick={handleSave} />
+              </>
+            ) : (
+              <Button1 name="Edit" h="48px" w="130px" onClick={() => setIsEditing(true)} />
+            )}
           </HStack>
         </Box>
       </Flex>
+      
       <TextC
         heading="YOGA PROFILE"
         fs={{ base: 24, sm: 28, lg: 48 }}
         lh="65px"
         fw={{ base: 700, lg: 500 }}
-        al ="center"
+        al="center"
         pt="30px"
       />
-      <Yogaprofile />
+      <Yogaprofile userName={name} sessions={sessions} courses={courses} />
     </>
   );
 }

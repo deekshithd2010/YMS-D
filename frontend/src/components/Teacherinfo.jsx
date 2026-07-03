@@ -11,54 +11,47 @@ import {
 import TextP from "./TextP";
 import Pic from "./Pic";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+
 function Teacherinfo(props) {
   return (
     <>
-      <SimpleGrid columns={6} gap="20px" display={{ base: "none", lg: "flex" }} paddingBlock="100px">
-        <VStack w="270px">
-          <TextP heading="Name" fw="500" fs="20px" lh="28px" al="center" />
+      <SimpleGrid columns={6} gap="20px" display={{ base: "none", lg: "flex" }} width="100%" alignItems="center">
+        <VStack w="200px" align="left">
           <HStack paddingBlock="10px" h="80px">
-            <Pic w="45px" h="45px" src="public\images\profile.jpg" br="100%" />
-            <TextP heading="Name" fw="400" fs="16px" lh="24px" />
+            <Pic w="45px" h="45px" src={props.image || "/images/profile.jpg"} br="100%" />
+            <TextP heading={props.name || "Teacher"} fw="400" fs="16px" lh="24px" />
           </HStack>
         </VStack>
+
         <VStack w="220px">
-          <TextP heading="Email" fw="500" fs="20px" lh="28px" al="center" />
           <Flex paddingBlock="10px" h="80px" alignItems="center">
-            <TextP
-              heading="deekshithdekshi@gmail.com"
-              fw="300"
-              fs="14px"
-              lh="28px"
-            />
+            <TextP heading={props.email || ""} fw="300" fs="14px" lh="28px" />
           </Flex>
         </VStack>
 
-        <VStack w="200px">
-          <TextP heading="Role" fw="500" fs="20px" lh="28px" al="center" />
+        <VStack w="180px">
           <Flex paddingBlock="10px" h="80px" alignItems="center">
-            <TextP heading="Session Teacher" fw="400" fs="16px" lh="28px" />
+            <TextP heading={props.role || "Instructor"} fw="400" fs="16px" lh="28px" />
           </Flex>
         </VStack>
 
-        <VStack w="200px">
-          <TextP
-            heading="Role Details"
-            fw="500"
-            fs="20px"
-            lh="28px"
-            al="center"
-          />
+        <VStack w="180px">
           <Flex paddingBlock="10px" h="80px" alignItems="center">
-            <TextP heading="PGDYT" fw="400" fs="16px" lh="28px" />
+            <TextP heading={props.roleDetails || "General"} fw="400" fs="16px" lh="28px" />
           </Flex>
         </VStack>
+
         <VStack>
-<br/>
+          <Spacer />
           <Flex paddingBlock="10px" h="80px" alignItems="center">
             <HStack>
-              <IconButton bg="none" icon={<DeleteIcon />} />
-              <IconButton bg="none" icon={<EditIcon />} />
+              <IconButton
+                bg="none"
+                icon={<DeleteIcon />}
+                aria-label="Delete Teacher"
+                onClick={() => props.onDelete && props.onDelete(props.id)}
+                _hover={{ color: "red.500" }}
+              />
             </HStack>
           </Flex>
         </VStack>
@@ -67,6 +60,14 @@ function Teacherinfo(props) {
   );
 }
 
-Teacherinfo.propTypes = {};
+Teacherinfo.propTypes = {
+  id: PropTypes.number,
+  name: PropTypes.string,
+  email: PropTypes.string,
+  role: PropTypes.string,
+  roleDetails: PropTypes.string,
+  image: PropTypes.string,
+  onDelete: PropTypes.func,
+};
 
 export default Teacherinfo;

@@ -12,6 +12,8 @@ function Check(props) {
         lh="18px"
         textColor="#000000"
         colorScheme={props.cs}
+        isChecked={props.isChecked}
+        onChange={props.onChange}
       >
         {props.title}
       </Checkbox>

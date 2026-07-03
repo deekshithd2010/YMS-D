@@ -20,6 +20,9 @@ function Textbox2(props) {
         border="0.6px solid #000000"
         type={props.ty}
         placeholder={props.ph}
+        value={props.value}
+        onChange={props.onChange}
+        disabled={props.disabled}
         />
     </>
   )

@@ -14,16 +14,32 @@ import { HamburgerIcon } from "@chakra-ui/icons";
 import { Link, useLocation } from "react-router-dom";
 import Menu from "./Menu";
 import Button1 from "../components/Button1";
+import axios from "axios";
 
 function Navbar2() {
   const [show, setShow] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
 
-  // Sync login status with route changes
+  // Sync login status and admin privileges with route changes
   useEffect(() => {
     const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
     setIsLoggedIn(!!token);
+
+    if (token) {
+      axios.get('/ymsapi/profile/', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res => {
+        setIsAdmin(!!res.data.is_admin);
+      })
+      .catch(() => {
+        setIsAdmin(false);
+      });
+    } else {
+      setIsAdmin(false);
+    }
   }, [location]);
 
   const showNav = () => {
@@ -64,6 +80,9 @@ function Navbar2() {
         <Box display="grid"> <Pic src="\images\Logo.png" w="200px" h="80px" d="grid" /></Box>
         <Link to="/Instructors"><Navbutton d={{ base: 'none', sm: 'none', md: 'none', lg: "grid", xl: "grid" }} name="INSTRUCTORS" /></Link>
         <Link to="/Contact"><Navbutton d={{ base: 'none', sm: 'none', md: 'none', lg: "grid", xl: "grid" }} name="CONTACT US" /></Link>
+        {isAdmin && (
+          <Link to="/Admin"><Navbutton d={{ base: 'none', sm: 'none', md: 'none', lg: "grid", xl: "grid" }} name="ADMIN" /></Link>
+        )}
 
         {!isLoggedIn ? (
           <>
@@ -203,6 +222,7 @@ function Navbar2() {
         <Menu
           onClose={() => setShow(false)}
           isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
           handleLogout={handleLogout}
         />
       )}

@@ -6,7 +6,7 @@ import Navbutton from '../components/Navbutton'
 import Button1 from '../components/Button1'
 import Button2 from '../components/Button2'
 
-function Menu({ onClose, isLoggedIn, handleLogout }) {
+function Menu({ onClose, isLoggedIn, isAdmin, handleLogout }) {
   return (
     <>
       {/* 50% transparent dark backdrop */}
@@ -63,6 +63,12 @@ function Menu({ onClose, isLoggedIn, handleLogout }) {
           </Link>
         )}
 
+        {isAdmin && (
+          <Link to="/Admin" onClick={onClose}>
+            <Navbutton d="grid" name="ADMIN PANEL" />
+          </Link>
+        )}
+
         <Box borderTop="1px solid #E2E8F0" marginY="10px" />
 
         {/* Login/Signup vs Logout Buttons */}
@@ -115,4 +121,4 @@ function Menu({ onClose, isLoggedIn, handleLogout }) {
   )
 }
 
-export default Menu
+export default Menu;

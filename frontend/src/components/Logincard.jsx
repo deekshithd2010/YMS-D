@@ -8,7 +8,7 @@ import Text2 from "./Text2";
 import Textbox from "./Textbox";
 import Passwordbox from "./Passwordbox";
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 
 function Logincard(props) {
@@ -74,7 +74,9 @@ function Logincard(props) {
           />
           <HStack gap={{ base: "20px", sm: "160px" }}>
             <Check title="Remember me" />
-            <Text2 heading="Forgot Password ?" fs="12px" lh="18px" />
+            <Link to="/ForgotPassword">
+              <Text2 heading="Forgot Password ?" fs="12px" lh="18px" />
+            </Link>
           </HStack>
           <br />
           <Button1 type="submit" name="Login" h="58px" w={{ base: 275, sm: 430, md: 430, lg: 423 }}  />

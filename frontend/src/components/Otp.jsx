@@ -5,7 +5,7 @@ function Otp(props) {
   return (
     <>
       <HStack>
-        <PinInput placeholder="" fontFamily="Poppins">
+        <PinInput placeholder="" fontFamily="Poppins" value={props.value} onChange={props.onChange}>
           <PinInputField
             w="44px"
             h="48px"
