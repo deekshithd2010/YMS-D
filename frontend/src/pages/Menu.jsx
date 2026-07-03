@@ -1,78 +1,117 @@
-import { Box, Flex, Grid, SimpleGrid } from '@chakra-ui/react'
+import { Box, Flex, IconButton } from '@chakra-ui/react'
+import { CloseIcon } from '@chakra-ui/icons'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import Navbutton from '../components/Navbutton'
 import Button1 from '../components/Button1'
 import Button2 from '../components/Button2'
 
-function Menu({ onClose }) {
+function Menu({ onClose, isLoggedIn, handleLogout }) {
   return (
     <>
+      {/* 50% transparent dark backdrop */}
+      <Box
+        position="fixed"
+        top="0"
+        left="0"
+        width="100vw"
+        height="100vh"
+        bg="rgba(0, 0, 0, 0.5)"
+        zIndex="998"
+        onClick={onClose}
+        display={{ base: "block", lg: "none" }}
+      />
 
+      {/* Side-aligned Drawer Menu Panel */}
       <Flex
-        display={{base:"flex",lg:"none"}}
+        display={{ base: "flex", lg: "none" }}
         direction="column"
-        position="absolute"
-        top="80px"
-        left="0px"
-        width="100%"
+        position="fixed"
+        top="0"
+        right="0"
+        width="280px"
+        height="100vh"
         bg="#FFFFFF"
         zIndex="999"
-        boxShadow="0px 8px 16px rgba(0, 0, 0, 0.1)"
-        padding="20px"
-        gap="10px"
+        boxShadow="-8px 0px 16px rgba(0, 0, 0, 0.15)"
+        padding="25px"
+        gap="15px"
+        alignItems="stretch"
       >
+        {/* Header inside drawer with close button */}
+        <Flex justifyContent="flex-end" marginBottom="10px">
+          <IconButton
+            icon={<CloseIcon w="12px" h="12px" />}
+            onClick={onClose}
+            aria-label="Close Menu"
+            variant="ghost"
+            size="sm"
+          />
+        </Flex>
 
-      <Link to="/" onClick={onClose}> <Navbutton d="grid" name="HOME" /></Link>
+        {/* Navigation Links */}
+        <Link to="/" onClick={onClose}> <Navbutton d="grid" name="HOME" /></Link>
         <Link to="/Yogasessions" onClick={onClose}><Navbutton d="grid" name="YOGA SESSION" /></Link>
         <Link to="/YogaCourses" onClick={onClose}><Navbutton d="grid" name="YOGA COURSES" /></Link>
         <Link to="/YogaForms" onClick={onClose}><Navbutton d="grid" name="YOGIC FORMS" /></Link>
-       <Link to="/Instructors" onClick={onClose}><Navbutton d="grid"  name="INSTRUCTORS" /></Link>
-       <Link to="/Contact" onClick={onClose}><Navbutton d="grid" name="CONTACT US" /></Link>
-       <Link to="/Profile" onClick={onClose}><Navbutton d="grid" name="PROFILE" /></Link>
+        <Link to="/Instructors" onClick={onClose}><Navbutton d="grid" name="INSTRUCTORS" /></Link>
+        <Link to="/Contact" onClick={onClose}><Navbutton d="grid" name="CONTACT US" /></Link>
+        
+        {isLoggedIn && (
+          <Link to="/Profile" onClick={onClose}>
+            <Navbutton d="grid" name="PROFILE" />
+          </Link>
+        )}
 
-        <Box
-          width="155px"
-          height="80px"
-          alignContent="center"
-          justifyContent="center"
-          d="grid"
-        >
-      <Link to="/Login" onClick={onClose}>   <Button1
-            name="Login"
-            bg="#285430"
-            br="7.5px"
-            h="45px"
-            w="135px"
-            fs="14px"
-            lh="21px"
-            c="#FFFFFF"
-            d="grid"
-          ></Button1></Link>
-        </Box>
-        <Box
-          width="100%"
-          height="80px"
-          alignContent="center"
-          justifyContent="center"
-          d="grid"
-        >
-         <Link to="/Signup" onClick={onClose}><Button2
-            name="Sign up"
-            bg="#D9D9D9"
-            br="7.5px"
-            h="45px"
-            w="135px"
-            fs="14px"
-            lh="21px"
-            c="#000000"
-            d="grid"
-          ></Button2></Link> 
-        </Box>
+        <Box borderTop="1px solid #E2E8F0" marginY="10px" />
+
+        {/* Login/Signup vs Logout Buttons */}
+        {!isLoggedIn ? (
+          <Flex direction="column" gap="10px" marginTop="auto">
+            <Link to="/Login" onClick={onClose} style={{ width: '100%' }}>
+              <Button1
+                name="Login"
+                bg="#285430"
+                br="7.5px"
+                h="45px"
+                w="100%"
+                fs="14px"
+                lh="21px"
+                c="#FFFFFF"
+                d="grid"
+              />
+            </Link>
+            <Link to="/Signup" onClick={onClose} style={{ width: '100%' }}>
+              <Button2
+                name="Sign up"
+                bg="#D9D9D9"
+                br="7.5px"
+                h="45px"
+                w="100%"
+                fs="14px"
+                lh="21px"
+                c="#000000"
+                d="grid"
+              />
+            </Link>
+          </Flex>
+        ) : (
+          <Flex direction="column" gap="10px" marginTop="auto" onClick={() => { handleLogout(); onClose(); }}>
+            <Button2
+              name="Logout"
+              bg="#D9D9D9"
+              br="7.5px"
+              h="45px"
+              w="100%"
+              fs="14px"
+              lh="21px"
+              c="#000000"
+              d="grid"
+            />
+          </Flex>
+        )}
       </Flex>
-      
     </>
-
   )
 }
 

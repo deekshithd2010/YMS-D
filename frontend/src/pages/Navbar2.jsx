@@ -15,17 +15,21 @@ import { Link } from "react-router-dom";
 import Menu from "./Menu";
 import Button1 from "../components/Button1";
 function Navbar2() {
-const [show,setShow]=useState(false)
-const showNav = () =>{
-  if(show == true)
-  {
-    setShow(false)
-  }
-  else
-  {
-    setShow(true)
-  }
-}
+  const [show, setShow] = useState(false);
+  
+  const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+  const isLoggedIn = !!token;
+
+  const showNav = () => {
+    setShow(!show);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    window.location.href = '/';
+  };
   return (
     <>
 
@@ -56,95 +60,102 @@ const showNav = () =>{
        <Link to="/Instructors"><Navbutton  d={{base:'none',sm:'none',md:'none',lg:"grid",xl:"grid"}} name="INSTRUCTORS" /></Link>
        <Link to="/Contact"><Navbutton  d={{base:'none',sm:'none',md:'none',lg:"grid",xl:"grid"}} name="CONTACT US" /></Link>
 
-       <Link to="/Login">  <Box
-          width="155px"
-          height="80px"
-          alignContent="center"
-          justifyContent="center"
-          display={{
-            base: "none",
-            sm: "none",
-            md: "none",
-            lg: "grid",
-            xl: "grid",
-          }}
-        >         <Button1
-            name="Login"
-            bg="#285430"
-            br="7.5px"
-            h="45px"
-            w="120px"
-            fs="14px"
-            lh="21px"
-            d={{base:'none',sm:'none',md:'none',lg:"grid",xl:"grid"}}
-            c="#FFFFFF"
-          ></Button1>
-        </Box></Link>
-        <Link to="/Signup"><Box
-          width="155px"
-          height="80px"
-          alignContent="center"
-          justifyContent="center"
-          display={{
-            base: "none",
-            sm: "none",
-            md: "none",
-            lg: "grid",
-            xl: "grid",
-          }}
-        >         <Button2
-            name="Sign up"
-            bg="#D9D9D9"
-            br="7.5px"
-            h="45px"
-            w="120px"
-            fs="14px"
-            lh="21px"
-            c="#000000"
-          ></Button2>
-        </Box></Link> 
-
-
-        {/* <Box w="155px" h="80px" align="center">
-        <Link to="/Profile"> <Image
-            src="\images\profile.jpg"
-            borderRadius="100%"
-            width="45px"
-            height="45px"
-            marginBlock="17px"
-            display={{
-              base: "none",
-              sm: "none",
-              md: "none",
-              lg: "flex",
-              xl: "flex",
-            }}
-          /></Link>
-        </Box>
-      <Link to="/"><Box
-          width="155px"
-          height="80px"
-          alignContent="center"
-          justifyContent="center"
-          display={{
-            base: "none",
-            sm: "none",
-            md: "none",
-            lg: "grid",
-            xl: "grid",
-          }}
-        >
-          <Button2
-            name="Logout"
-            bg="#D9D9D9"
-            br="7.5px"
-            h="45px"
-            w="135px"
-            fs="14px"
-            lh="21px"
-            c="#000000"
-          ></Button2>
-        </Box></Link> */}
+        {!isLoggedIn ? (
+          <>
+            <Link to="/Login">  <Box
+              width="155px"
+              height="80px"
+              alignContent="center"
+              justifyContent="center"
+              display={{
+                base: "none",
+                sm: "none",
+                md: "none",
+                lg: "grid",
+                xl: "grid",
+              }}
+            >         <Button1
+                name="Login"
+                bg="#285430"
+                br="7.5px"
+                h="45px"
+                w="120px"
+                fs="14px"
+                lh="21px"
+                d={{base:'none',sm:'none',md:'none',lg:"grid",xl:"grid"}}
+                c="#FFFFFF"
+              ></Button1>
+            </Box></Link>
+            <Link to="/Signup"><Box
+              width="155px"
+              height="80px"
+              alignContent="center"
+              justifyContent="center"
+              display={{
+                base: "none",
+                sm: "none",
+                md: "none",
+                lg: "grid",
+                xl: "grid",
+              }}
+            >         <Button2
+                name="Sign up"
+                bg="#D9D9D9"
+                br="7.5px"
+                h="45px"
+                w="120px"
+                fs="14px"
+                lh="21px"
+                c="#000000"
+              ></Button2>
+            </Box></Link> 
+          </>
+        ) : (
+          <>
+            <Box w="155px" h="80px" align="center">
+            <Link to="/Profile"> <Image
+                src="\images\profile.jpg"
+                borderRadius="100%"
+                width="45px"
+                height="45px"
+                marginBlock="17px"
+                display={{
+                  base: "none",
+                  sm: "none",
+                  md: "none",
+                  lg: "flex",
+                  xl: "flex",
+                }}
+              /></Link>
+            </Box>
+            <Box
+              width="155px"
+              height="80px"
+              alignContent="center"
+              justifyContent="center"
+              display={{
+                base: "none",
+                sm: "none",
+                md: "none",
+                lg: "grid",
+                xl: "grid",
+              }}
+              onClick={handleLogout}
+              cursor="pointer"
+            >
+              <Button2
+                name="Logout"
+                bg="#D9D9D9"
+                br="7.5px"
+                h="45px"
+                w="135px"
+                fs="14px"
+                lh="21px"
+                c="#000000"
+              ></Button2>
+            </Box>
+          </>
+        )}
         
       </Flex>
 
@@ -192,7 +203,7 @@ const showNav = () =>{
        
       </SimpleGrid>
       {
-          show && (<Menu onClose={() => setShow(false)}/>)
+          show && (<Menu onClose={() => setShow(false)} isLoggedIn={isLoggedIn} handleLogout={handleLogout}/>)
         }
     </>
   );
