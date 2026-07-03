@@ -14,18 +14,22 @@ import { useNavigate } from 'react-router-dom';
 function Logincard(props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('/ymsapi/login/', { username, password });
       console.log(response.data);
-      // Handle successful login, e.g., store token in local storage and redirect
-      history.push('/Home');
+      // Store token in local storage
+      const token = response.data.access_token;
+      localStorage.accessToken = token;
+      localStorage.token = token;
+      // Redirect using useNavigate hook
+      navigate('/');
     } catch (error) {
       console.error(error);
-      // Handle error, e.g., display error message
+      alert("Login failed. Check your username and password.");
     }
   };
   return (

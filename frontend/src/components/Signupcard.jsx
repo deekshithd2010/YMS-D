@@ -11,20 +11,26 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 
 function Signupcard() {
-   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const history = useNavigate();
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const navigate = useNavigate();
 
-const handleRegister = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
     try {
-      const response = await axios.post('/ymsapi/register/', { username, password });
+      const response = await axios.post('/ymsapi/register/', { username, password, email });
       console.log(response.data);
-      // Handle successful registration, e.g., display success message and redirect
-      history.push('/Login');
+      alert("Registration successful! Please login.");
+      navigate('/Login');
     } catch (error) {
       console.error(error);
-      // Handle error, e.g., display error message
+      alert(error.response?.data?.detail || "Registration failed. Try again.");
     }
   };
 
@@ -55,20 +61,22 @@ const handleRegister = async (e) => {
             w={{ base: 275, sm: 430, md: 430, lg: 423 }}
             ty="email"
             ph="Enter your email"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <TextP heading="Username" fw="400" fs="16px" lh="24px" />
           <Textbox
             w={{ base: 275, sm: 430, md: 430, lg: 423 }}
             ty="text"
             ph="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
           <TextP heading="Password" fw="400" fs="16px" lh="24px" />
           <Passwordbox
             w={{ base: 275, sm: 430, md: 430, lg: 423 }}
             ph="Enter your Password"
-             value={password}
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
 
@@ -76,6 +84,8 @@ const handleRegister = async (e) => {
           <Passwordbox
             w={{ base: 275, sm: 430, md: 430, lg: 423 }}
             ph="Confirm your Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
           <br />
           <Button1 type="submit" name="Register" h="58px" w={{ base: 275, sm: 430, md: 430, lg: 423 }} />

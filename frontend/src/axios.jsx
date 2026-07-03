@@ -3,7 +3,7 @@ import { ACCESS_TOKEN, clearJwt, getJwt } from './utils/auth';
 
 // Axios instance
 const HTTP = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL || 'http://localhost:8000',
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
