@@ -7,7 +7,7 @@ import Check from "./Check";
 import Text2 from "./Text2";
 import Textbox from "./Textbox";
 import Passwordbox from "./Passwordbox";
-import axios from 'axios';
+import { HTTP } from '../axios';
 import { useNavigate, Link } from 'react-router-dom';
 
 
@@ -19,7 +19,7 @@ function Logincard(props) {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/ymsapi/login/', { username, password });
+      const response = await HTTP.post('/ymsapi/login/', { username, password });
       console.log(response.data);
       // Store token in local storage
       const token = response.data.access_token;

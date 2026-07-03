@@ -6,7 +6,7 @@ import Check from "./Check";
 import Button1 from "./Button1";
 import { Card, HStack, VStack } from "@chakra-ui/react";
 import Passwordbox from "./Passwordbox";
-import axios from 'axios';
+import { HTTP } from '../axios';
 
 import { useNavigate } from "react-router-dom";
 
@@ -24,7 +24,7 @@ function Signupcard() {
       return;
     }
     try {
-      const response = await axios.post('/ymsapi/register/', { username, password, email });
+      const response = await HTTP.post('/ymsapi/register/', { username, password, email });
       console.log(response.data);
       alert("Registration successful! Please login.");
       navigate('/Login');
