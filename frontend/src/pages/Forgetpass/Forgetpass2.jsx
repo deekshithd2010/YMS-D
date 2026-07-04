@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Flex, VStack, HStack, Box } from "@chakra-ui/react";
+import { Flex, VStack, HStack, Box, useToast } from "@chakra-ui/react";
 import TextP from "../../components/TextP";
 import Button1 from "../../components/Button1";
 import Otp from "../../components/Otp";
@@ -10,25 +10,50 @@ function Forgetpass2() {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
   const email = localStorage.getItem("resetEmail");
+  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email) {
-      alert("Missing email context. Please start password reset again.");
+      toast({
+        title: "Context Error",
+        description: "Missing email context. Please start password reset again.",
+        status: "error",
+        duration: 3500,
+        isClosable: true
+      });
       navigate("/ForgotPassword");
       return;
     }
     if (otp.length < 6) {
-      alert("Please enter the complete 6-digit code.");
+      toast({
+        title: "Validation Error",
+        description: "Please enter the complete 6-digit code.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true
+      });
       return;
     }
     try {
       const response = await axios.post("/ymsapi/verify-otp/", { email, otp });
-      alert(response.data.message || "OTP verified successfully!");
+      toast({
+        title: "OTP Verified",
+        description: response.data.message || "OTP verified successfully!",
+        status: "success",
+        duration: 3000,
+        isClosable: true
+      });
       navigate("/ResetPassword");
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.detail || "Invalid or expired OTP. Please try again.");
+      toast({
+        title: "Verification Failed",
+        description: error.response?.data?.detail || "Invalid or expired OTP. Please try again.",
+        status: "error",
+        duration: 4000,
+        isClosable: true
+      });
     }
   };
 
@@ -36,10 +61,22 @@ function Forgetpass2() {
     if (!email) return;
     try {
       const response = await axios.post("/ymsapi/forgot-password/", { email });
-      alert(response.data.message || "A new OTP code has been sent!");
+      toast({
+        title: "OTP Resent",
+        description: response.data.message || "A new OTP code has been sent!",
+        status: "success",
+        duration: 3000,
+        isClosable: true
+      });
     } catch (error) {
       console.error(error);
-      alert("Failed to resend OTP. Try again.");
+      toast({
+        title: "Resend Failed",
+        description: "Failed to resend OTP. Try again.",
+        status: "error",
+        duration: 4000,
+        isClosable: true
+      });
     }
   };
 

@@ -4,7 +4,7 @@ import TextP from "./TextP";
 import Text2 from "./Text2";
 import Check from "./Check";
 import Button1 from "./Button1";
-import { Card, HStack, VStack } from "@chakra-ui/react";
+import { Card, HStack, VStack, useToast } from "@chakra-ui/react";
 import Passwordbox from "./Passwordbox";
 import { HTTP } from '../axios';
 
@@ -16,21 +16,40 @@ function Signupcard() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      toast({
+        title: "Validation Error",
+        description: "Passwords do not match!",
+        status: "warning",
+        duration: 3000,
+        isClosable: true
+      });
       return;
     }
     try {
       const response = await HTTP.post('/ymsapi/register/', { username, password, email });
       console.log(response.data);
-      alert("Registration successful! Please login.");
+      toast({
+        title: "Registration Successful",
+        description: "Account created! Please login.",
+        status: "success",
+        duration: 4000,
+        isClosable: true
+      });
       navigate('/Login');
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.detail || "Registration failed. Try again.");
+      toast({
+        title: "Registration Failed",
+        description: error.response?.data?.detail || "Something went wrong. Please try again.",
+        status: "error",
+        duration: 4000,
+        isClosable: true
+      });
     }
   };
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Flex, VStack } from "@chakra-ui/react";
+import { Flex, VStack, useToast } from "@chakra-ui/react";
 import TextP from "../../components/TextP";
 import Button1 from "../../components/Button1";
 import Textbox from "../../components/Textbox";
@@ -11,20 +11,39 @@ function Forgetpass3() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
   const email = localStorage.getItem("resetEmail");
+  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email) {
-      alert("Missing email context. Please start password reset again.");
+      toast({
+        title: "Context Error",
+        description: "Missing email context. Please start password reset again.",
+        status: "error",
+        duration: 3500,
+        isClosable: true
+      });
       navigate("/ForgotPassword");
       return;
     }
     if (!password || !confirmPassword) {
-      alert("Please fill in both password fields.");
+      toast({
+        title: "Validation Error",
+        description: "Please fill in both password fields.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true
+      });
       return;
     }
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      toast({
+        title: "Validation Error",
+        description: "Passwords do not match!",
+        status: "warning",
+        duration: 3000,
+        isClosable: true
+      });
       return;
     }
     try {
@@ -33,12 +52,24 @@ function Forgetpass3() {
         new_password: password,
         confirm_password: confirmPassword,
       });
-      alert(response.data.message || "Password reset successful! Please login.");
+      toast({
+        title: "Password Reset",
+        description: response.data.message || "Password reset successful! Please login.",
+        status: "success",
+        duration: 4000,
+        isClosable: true
+      });
       localStorage.removeItem("resetEmail");
       navigate("/Login");
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.detail || "Could not reset password. Try again.");
+      toast({
+        title: "Reset Failed",
+        description: error.response?.data?.detail || "Could not reset password. Try again.",
+        status: "error",
+        duration: 4000,
+        isClosable: true
+      });
     }
   };
 

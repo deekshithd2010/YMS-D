@@ -4,7 +4,23 @@ from database import engine, Base
 import models  # import registers tables with metadata
 
 # Import all routers
-from routers import auth, profile, students, teachers, registrations, contact, instructors
+from routers import auth, profile, students, teachers, registrations, contact, instructors, payments
+
+# Import new routers with try/except for graceful fallback
+try:
+    from routers import admin_dashboard
+except ImportError:
+    admin_dashboard = None
+
+try:
+    from routers import yoga_manage
+except ImportError:
+    yoga_manage = None
+
+try:
+    from routers import instructor_router
+except ImportError:
+    instructor_router = None
 
 app = FastAPI(
     title="YMS API",
@@ -41,7 +57,17 @@ app.include_router(teachers.router, prefix="/ymsapi")
 app.include_router(registrations.router, prefix="/ymsapi")
 app.include_router(contact.router, prefix="/ymsapi")
 app.include_router(instructors.router, prefix="/ymsapi")
+app.include_router(payments.router, prefix="/ymsapi")
+
+# Include new routers
+if admin_dashboard:
+    app.include_router(admin_dashboard.router, prefix="/ymsapi")
+if yoga_manage:
+    app.include_router(yoga_manage.router, prefix="/ymsapi")
+if instructor_router:
+    app.include_router(instructor_router.router, prefix="/ymsapi")
 
 @app.get("/")
 def read_root():
     return {"message": "YMS API is running!"}
+

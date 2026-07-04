@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import TextP from "../../components/TextP";
-import { Flex, Box, VStack } from "@chakra-ui/react";
+import { Flex, Box, VStack, useToast } from "@chakra-ui/react";
 import Textbox from "../../components/Textbox";
 import Button1 from "../../components/Button1";
 import axios from "axios";
@@ -9,21 +9,40 @@ import { useNavigate } from "react-router-dom";
 function Forgetpass1() {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email) {
-      alert("Please enter your email.");
+      toast({
+        title: "Validation Error",
+        description: "Please enter your email.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true
+      });
       return;
     }
     try {
       const response = await axios.post("/ymsapi/forgot-password/", { email });
-      alert(response.data.message || "OTP sent successfully. Please check your email / console.");
+      toast({
+        title: "OTP Sent",
+        description: response.data.message || "OTP sent successfully. Check your email / console.",
+        status: "success",
+        duration: 4000,
+        isClosable: true
+      });
       localStorage.setItem("resetEmail", email);
       navigate("/VerifyOTP");
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.detail || "Could not request password reset. Check your email.");
+      toast({
+        title: "Request Failed",
+        description: error.response?.data?.detail || "Could not request password reset. Check your email.",
+        status: "error",
+        duration: 4000,
+        isClosable: true
+      });
     }
   };
 

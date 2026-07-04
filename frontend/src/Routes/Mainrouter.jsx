@@ -43,10 +43,7 @@ import YIC from "../pages/YCapplications/YIC";
 
 // Admin and Forgot Password Flows
 import Admin from "../pages/Admin";
-import Admin2 from "../pages/Admin2";
-import AdminTeacher from "../pages/AdminTeacher";
-import AddStud from "../components/AddStud";
-import AddTeacher from "../components/AddTeacher";
+import InstructorDashboard from "../pages/InstructorDashboard";
 import Forgetpass1 from "../pages/Forgetpass/Forgetpass1";
 import Forgetpass2 from "../pages/Forgetpass/Forgetpass2";
 import Forgetpass3 from "../pages/Forgetpass/Forgetpass3";
@@ -107,12 +104,9 @@ function Mainrouter() {
           <Route exact path="/VerifyOTP" element={<Forgetpass2 />} />
           <Route exact path="/ResetPassword" element={<Forgetpass3 />} />
 
-          {/* Admin Dashboards routes */}
+          {/* Admin and Instructor Dashboards routes */}
           <Route exact path="/Admin" element={<Admin />} />
-          <Route exact path="/Admin/Students" element={<Admin2 />} />
-          <Route exact path="/Admin/Teachers" element={<AdminTeacher />} />
-          <Route exact path="/Admin/AddStudent" element={<AddStud />} />
-          <Route exact path="/Admin/AddTeacher" element={<AddTeacher />} />
+          <Route exact path="/Instructor" element={<InstructorDashboard />} />
         </Routes>
         <Footer />
       </Router>

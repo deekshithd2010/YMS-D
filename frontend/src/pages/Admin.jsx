@@ -1,159 +1,151 @@
 import React, { useState, useEffect } from "react";
-import { Flex, HStack, VStack, Card, SimpleGrid, Box } from "@chakra-ui/react";
-import TextP from "../components/TextP";
-import TP1 from "../components/TP1";
-import { MinusIcon } from "@chakra-ui/icons";
-import axios from "axios";
+import { Flex, Box, VStack, HStack, Text, Icon, useToast, Spinner, Divider } from "@chakra-ui/react";
+import { CalendarIcon, ViewIcon, EditIcon, AddIcon, SettingsIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-// Component Panel Imports
-import Admin2 from "./Admin2";
-import AdminTeacher from "./AdminTeacher";
-import AddStud from "../components/AddStud";
-import AddTeacher from "../components/AddTeacher";
+// Import all sub-views
+import SessionBookingsView from "../components/SessionBookingsView";
+import CourseBookingsView from "../components/CourseBookingsView";
+import ManageSessionsView from "../components/ManageSessionsView";
+import ManageCoursesView from "../components/ManageCoursesView";
+import AssignInstructorsView from "../components/AssignInstructorsView";
+import AddUserForm from "../components/AddUserForm";
+import AddInstructorForm from "../components/AddInstructorForm";
 
 function Admin() {
-  const [view, setView] = useState("students"); // "students", "teachers", "add_student", "add_teacher"
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [view, setView] = useState("session_bookings");
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
-
-  const token = localStorage.getItem("token") || localStorage.getItem("accessToken");
+  const toast = useToast();
 
   useEffect(() => {
+    checkAdminStatus();
+  }, []);
+
+  const checkAdminStatus = async () => {
+    const token = localStorage.getItem("token") || localStorage.getItem("accessToken");
     if (!token) {
-      alert("Admin authorization required.");
+      toast({ title: "Please login first", status: "warning", duration: 3000, isClosable: true });
       navigate("/Login");
       return;
     }
-    checkAdminStatus();
-  }, [token]);
-
-  const checkAdminStatus = async () => {
     try {
-      const response = await axios.get("/ymsapi/profile/", {
+      const res = await axios.get("/ymsapi/profile/", {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (response.data.is_admin) {
+      if (res.data && res.data.is_admin) {
         setIsAdmin(true);
       } else {
-        alert("Access denied. Admin privileges required.");
+        toast({ title: "Access Denied", description: "Admin privileges required", status: "error", duration: 3000, isClosable: true });
         navigate("/");
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      toast({ title: "Session expired", status: "error", duration: 3000, isClosable: true });
+      localStorage.removeItem("token");
+      localStorage.removeItem("accessToken");
       navigate("/Login");
     } finally {
       setLoading(false);
     }
   };
 
+  const navItems = [
+    { id: "session_bookings", label: "Session Bookings", icon: CalendarIcon },
+    { id: "course_bookings", label: "Course Bookings", icon: ViewIcon },
+    { id: "manage_sessions", label: "Manage Sessions", icon: EditIcon },
+    { id: "manage_courses", label: "Manage Courses", icon: EditIcon },
+    { id: "assign_instructors", label: "Assign Instructors", icon: SettingsIcon },
+    { id: "add_user", label: "Add User", icon: AddIcon },
+    { id: "add_instructor", label: "Add Instructor", icon: AddIcon },
+  ];
+
   if (loading) {
-    return <Box padding="100px" textAlign="center">Loading Admin Panel...</Box>;
+    return (
+      <Flex minH="80vh" justify="center" align="center" bg="#F6F6F6">
+        <Spinner size="xl" color="#285430" thickness="4px" />
+      </Flex>
+    );
   }
 
-  if (!isAdmin) {
-    return null;
-  }
+  if (!isAdmin) return null;
 
   return (
-    <>
-      <Flex direction={{ base: "column", lg: "row" }} width="100%">
-        {/* Admin Sidebar Navigation */}
-        <Flex
-          bg="#285430"
-          h={{ base: "auto", lg: "1000px" }}
-          w={{ base: "100%", lg: "300px" }}
-          paddingTop={{ base: "20px", lg: "120px" }}
-          paddingBottom={{ base: "20px", lg: "120px" }}
-          paddingInline="20px"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <VStack gap="35px" width="100%">
-            <Box
-              onClick={() => setView("students")}
+    <Flex minH="calc(100vh - 100px)" bg="#F6F6F6" direction={{ base: "column", lg: "row" }}>
+      {/* Sidebar */}
+      <Box w={{ base: "100%", lg: "280px" }} bg="#285430" color="white" py="30px" px="16px" flexShrink={0}>
+        <Text fontFamily="Cinzel" fontSize="24px" fontWeight="700" mb="30px" pl="16px">Admin Panel</Text>
+        <VStack align="stretch" gap="8px">
+          {navItems.map((item) => (
+            <Flex
+              key={item.id}
+              align="center"
+              px="16px"
+              py="12px"
+              borderRadius="8px"
               cursor="pointer"
-              width="100%"
-              bg={view === "students" ? "rgba(255,255,255,0.15)" : "transparent"}
-              borderRadius="5px"
-              padding="10px"
+              bg={view === item.id ? "rgba(255, 255, 255, 0.15)" : "transparent"}
+              _hover={{ bg: "rgba(255, 255, 255, 0.1)" }}
+              transition="all 0.2s"
+              onClick={() => setView(item.id)}
             >
-              <TP1
-                heading="View Students"
-                fs="16px"
-                lh="26px"
-                al="center"
-                c="#FFFFFF"
-                fw={view === "students" ? "600" : "400"}
-              />
-            </Box>
-            
-            <Box
-              onClick={() => setView("teachers")}
-              cursor="pointer"
-              width="100%"
-              bg={view === "teachers" ? "rgba(255,255,255,0.15)" : "transparent"}
-              borderRadius="5px"
-              padding="10px"
-            >
-              <TP1
-                heading="View Teachers"
-                fs="16px"
-                lh="26px"
-                al="center"
-                c="#FFFFFF"
-                fw={view === "teachers" ? "600" : "400"}
-              />
-            </Box>
+              <Icon as={item.icon} mr="12px" boxSize={4} />
+              <Text fontFamily="Poppins" fontSize="15px" fontWeight={view === item.id ? "600" : "400"}>
+                {item.label}
+              </Text>
+            </Flex>
+          ))}
+          
+          <Divider opacity="0.3" my="10px" />
+          
+          <Flex
+            align="center"
+            px="16px"
+            py="12px"
+            borderRadius="8px"
+            cursor="pointer"
+            _hover={{ bg: "rgba(255, 255, 255, 0.1)" }}
+            transition="all 0.2s"
+            onClick={() => navigate("/")}
+          >
+            <Icon as={ArrowBackIcon} mr="12px" boxSize={4} />
+            <Text fontFamily="Poppins" fontSize="15px" fontWeight="400">Go to Website</Text>
+          </Flex>
 
-            <Box
-              onClick={() => setView("add_student")}
-              cursor="pointer"
-              width="100%"
-              bg={view === "add_student" ? "rgba(255,255,255,0.15)" : "transparent"}
-              borderRadius="5px"
-              padding="10px"
-            >
-              <TP1
-                heading="Add Students"
-                fs="16px"
-                lh="26px"
-                al="center"
-                c="#FFFFFF"
-                fw={view === "add_student" ? "600" : "400"}
-              />
-            </Box>
+          <Flex
+            align="center"
+            px="16px"
+            py="12px"
+            borderRadius="8px"
+            cursor="pointer"
+            _hover={{ bg: "rgba(255, 255, 255, 0.1)" }}
+            transition="all 0.2s"
+            onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("accessToken");
+              localStorage.removeItem("refreshToken");
+              toast({ title: "Logged out successfully", status: "success", duration: 2000 });
+              navigate("/Login");
+            }}
+          >
+            <Icon as={ArrowBackIcon} mr="12px" boxSize={4} transform="rotate(180deg)" />
+            <Text fontFamily="Poppins" fontSize="15px" fontWeight="400">Logout</Text>
+          </Flex>
+        </VStack>
+      </Box>
 
-            <Box
-              onClick={() => setView("add_teacher")}
-              cursor="pointer"
-              width="100%"
-              bg={view === "add_teacher" ? "rgba(255,255,255,0.15)" : "transparent"}
-              borderRadius="5px"
-              padding="10px"
-            >
-              <TP1
-                heading="Add Teachers"
-                fs="16px"
-                lh="26px"
-                al="center"
-                c="#FFFFFF"
-                fw={view === "add_teacher" ? "600" : "400"}
-              />
-            </Box>
-          </VStack>
-        </Flex>
-
-        {/* Content Pane */}
-        <Flex flex="1" padding="40px" bg="#F6F6F6" direction="column">
-          {view === "students" && <Admin2 />}
-          {view === "teachers" && <AdminTeacher />}
-          {view === "add_student" && <AddStud onSuccess={() => setView("students")} />}
-          {view === "add_teacher" && <AddTeacher onSuccess={() => setView("teachers")} />}
-        </Flex>
-      </Flex>
-    </>
+      {/* Main Content Pane */}
+      <Box flex="1" p={{ base: "16px", md: "32px", lg: "40px" }} overflowY="auto">
+        {view === "session_bookings" && <SessionBookingsView />}
+        {view === "course_bookings" && <CourseBookingsView />}
+        {view === "manage_sessions" && <ManageSessionsView />}
+        {view === "manage_courses" && <ManageCoursesView />}
+        {view === "assign_instructors" && <AssignInstructorsView />}
+        {view === "add_user" && <AddUserForm />}
+        {view === "add_instructor" && <AddInstructorForm />}
+      </Box>
+    </Flex>
   );
 }
 

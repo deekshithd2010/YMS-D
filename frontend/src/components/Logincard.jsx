@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Card, HStack, VStack } from "@chakra-ui/react";
+import { Card, HStack, VStack, useToast } from "@chakra-ui/react";
 import Button1 from "./Button1";
 import TextP from "./TextP";
 import Check from "./Check";
@@ -15,21 +15,45 @@ function Logincard(props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await HTTP.post('/ymsapi/login/', { username, password });
-      console.log(response.data);
-      // Store token in local storage
       const token = response.data.access_token;
       localStorage.accessToken = token;
       localStorage.token = token;
-      // Redirect using useNavigate hook
-      navigate('/');
+      
+      // Fetch user profile to check role
+      const profileRes = await HTTP.get('/ymsapi/profile/', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      toast({
+        title: "Login Successful",
+        description: `Welcome back, ${profileRes.data.name || username}!`,
+        status: "success",
+        duration: 3000,
+        isClosable: true
+      });
+
+      if (profileRes.data.is_admin) {
+        navigate('/Admin');
+      } else if (profileRes.data.is_instructor) {
+        navigate('/Instructor');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       console.error(error);
-      alert("Login failed. Check your username and password.");
+      toast({
+        title: "Login Failed",
+        description: error.response?.data?.detail || "Please check your username and password.",
+        status: "error",
+        duration: 4000,
+        isClosable: true
+      });
     }
   };
   return (

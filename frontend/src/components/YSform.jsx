@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import TextP from "./TextP";
 import Textbox2 from "./Textbox2";
-import { VStack, Flex, SimpleGrid, Box, HStack } from "@chakra-ui/react";
+import { VStack, Flex, SimpleGrid, Box, HStack, useToast } from "@chakra-ui/react";
 import Check from "./Check";
 import TC1 from "./TC1";
 import Button2 from "./Button2";
 import Button1 from "./Button1";
 import axios from "axios";
+import PaymentModal from "./PaymentModal";
 
 const YSform = (props) => {
   const [name, setName] = useState("");
@@ -19,6 +20,11 @@ const YSform = (props) => {
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [country, setCountry] = useState("");
+  
+  // Payment states
+  const [showPayment, setShowPayment] = useState(false);
+  const [regId, setRegId] = useState(null);
+  const toast = useToast();
 
   const handleGenderChange = (selectedGender) => {
     setGender(selectedGender);
@@ -39,7 +45,7 @@ const YSform = (props) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !email || !props.batchtime) {
-      alert("Name, Email, and Batch Time are required.");
+      toast({ title: "Validation Error", description: "Name, Email, and Batch Time are required.", status: "warning", duration: 3000, isClosable: true });
       return;
     }
 
@@ -56,7 +62,6 @@ const YSform = (props) => {
       batch_time: props.batchtime,
     };
 
-    // Attach Bearer token if logged in
     const headers = {};
     const token = localStorage.getItem("token") || localStorage.getItem("accessToken");
     if (token) {
@@ -65,11 +70,17 @@ const YSform = (props) => {
 
     try {
       const response = await axios.post("/ymsapi/session-registration/", payload, { headers });
-      alert("Session Registration submitted successfully!");
-      handleClear();
+      setRegId(response.data.id);
+      setShowPayment(true);
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.detail || "Registration failed. Try again.");
+      toast({
+        title: "Registration Failed",
+        description: error.response?.data?.detail || "Something went wrong. Please try again.",
+        status: "error",
+        duration: 4000,
+        isClosable: true
+      });
     }
   };
 
@@ -239,6 +250,19 @@ const YSform = (props) => {
           </SimpleGrid>
         </form>
       </VStack>
+      {showPayment && (
+        <PaymentModal
+          isOpen={showPayment}
+          onClose={() => setShowPayment(false)}
+          registrationType="session"
+          registrationId={regId}
+          amount={1500} // Session registration price
+          onPaymentSuccess={() => {
+            handleClear();
+            setShowPayment(false);
+          }}
+        />
+      )}
     </>
   );
 };

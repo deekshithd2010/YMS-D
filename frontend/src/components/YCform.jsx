@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import TextP from "./TextP";
-import { Box, Flex, HStack, SimpleGrid, VStack } from "@chakra-ui/react";
+import { Box, Flex, HStack, SimpleGrid, VStack, useToast } from "@chakra-ui/react";
 import TC1 from "./TC1";
 import Textbox2 from "./Textbox2";
 import Check from "./Check";
 import Button1 from "./Button1";
 import Button2 from "./Button2";
 import axios from "axios";
+import PaymentModal from "./PaymentModal";
 
 function YCform(props) {
   const [name, setName] = useState("");
@@ -19,6 +20,11 @@ function YCform(props) {
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [country, setCountry] = useState("");
+
+  // Payment states
+  const [showPayment, setShowPayment] = useState(false);
+  const [regId, setRegId] = useState(null);
+  const toast = useToast();
 
   const handleGenderChange = (selectedGender) => {
     setGender(selectedGender);
@@ -39,7 +45,7 @@ function YCform(props) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !email || !props.course || !props.coursename) {
-      alert("Name, Email, Course Code, and Course Name are required.");
+      toast({ title: "Validation Error", description: "Name, Email, Course Code, and Course Name are required.", status: "warning", duration: 3000, isClosable: true });
       return;
     }
 
@@ -57,7 +63,6 @@ function YCform(props) {
       course_name: props.coursename,
     };
 
-    // Attach Bearer token if logged in
     const headers = {};
     const token = localStorage.getItem("token") || localStorage.getItem("accessToken");
     if (token) {
@@ -66,11 +71,17 @@ function YCform(props) {
 
     try {
       const response = await axios.post("/ymsapi/course-registration/", payload, { headers });
-      alert("Course Registration submitted successfully!");
-      handleClear();
+      setRegId(response.data.id);
+      setShowPayment(true);
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.detail || "Registration failed. Try again.");
+      toast({
+        title: "Registration Failed",
+        description: error.response?.data?.detail || "Something went wrong. Please try again.",
+        status: "error",
+        duration: 4000,
+        isClosable: true
+      });
     }
   };
 
@@ -228,6 +239,19 @@ function YCform(props) {
           </SimpleGrid>
         </form>
       </VStack>
+      {showPayment && (
+        <PaymentModal
+          isOpen={showPayment}
+          onClose={() => setShowPayment(false)}
+          registrationType="course"
+          registrationId={regId}
+          amount={8500} // Course registration price
+          onPaymentSuccess={() => {
+            handleClear();
+            setShowPayment(false);
+          }}
+        />
+      )}
     </>
   );
 }

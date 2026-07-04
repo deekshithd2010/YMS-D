@@ -11,6 +11,7 @@ import {
   VStack,
   Box,
   Spacer,
+  useToast,
 } from "@chakra-ui/react";
 import Pic from "../components/Pic";
 import Yogaprofile from "./Yogaprofile";
@@ -33,12 +34,18 @@ function Profile() {
   const [courses, setCourses] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
-
   const token = localStorage.getItem("token") || localStorage.getItem("accessToken");
+  const toast = useToast();
 
   useEffect(() => {
     if (!token) {
-      alert("Please login to view your profile.");
+      toast({
+        title: "Authentication Required",
+        description: "Please login to view your profile.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true
+      });
       navigate("/Login");
       return;
     }
@@ -104,11 +111,23 @@ function Profile() {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      alert("Profile updated successfully!");
+      toast({
+        title: "Profile Updated",
+        description: "Your profile details have been saved.",
+        status: "success",
+        duration: 3000,
+        isClosable: true
+      });
       setIsEditing(false);
     } catch (error) {
       console.error(error);
-      alert("Error saving profile details.");
+      toast({
+        title: "Update Failed",
+        description: "Error saving profile details. Please try again.",
+        status: "error",
+        duration: 4000,
+        isClosable: true
+      });
     }
   };
 

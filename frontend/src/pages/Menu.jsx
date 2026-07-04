@@ -6,7 +6,7 @@ import Navbutton from '../components/Navbutton'
 import Button1 from '../components/Button1'
 import Button2 from '../components/Button2'
 
-function Menu({ onClose, isLoggedIn, isAdmin, handleLogout }) {
+function Menu({ onClose, isLoggedIn, isAdmin, isInstructor, handleLogout }) {
   return (
     <>
       {/* 50% transparent dark backdrop */}
@@ -63,6 +63,12 @@ function Menu({ onClose, isLoggedIn, isAdmin, handleLogout }) {
           </Link>
         )}
 
+        {isInstructor && (
+          <Link to="/Instructor" onClick={onClose}>
+            <Navbutton d="grid" name="INSTRUCTOR PANEL" />
+          </Link>
+        )}
+
         {isAdmin && (
           <Link to="/Admin" onClick={onClose}>
             <Navbutton d="grid" name="ADMIN PANEL" />
@@ -72,7 +78,7 @@ function Menu({ onClose, isLoggedIn, isAdmin, handleLogout }) {
         <Box borderTop="1px solid #E2E8F0" marginY="10px" />
 
         {/* Login/Signup vs Logout Buttons */}
-        {!isLoggedIn ? (
+        {isAdmin ? null : !isLoggedIn ? (
           <Flex direction="column" gap="10px" marginTop="auto">
             <Link to="/Login" onClick={onClose} style={{ width: '100%' }}>
               <Button1

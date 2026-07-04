@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { VStack, Card, Box } from "@chakra-ui/react";
+import { VStack, Card, Box, useToast } from "@chakra-ui/react";
 import TextP from "../components/TextP.jsx";
 import Textbox from "./Textbox.jsx";
 import Textbox2 from "./Textbox2.jsx";
@@ -12,11 +12,18 @@ function Contactcard(props) {
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !email || !subject || !message) {
-      alert("Please fill in all fields.");
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all fields.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true
+      });
       return;
     }
     try {
@@ -26,7 +33,13 @@ function Contactcard(props) {
         subject,
         message,
       });
-      alert(response.data.message || "Message sent successfully!");
+      toast({
+        title: "Message Sent",
+        description: response.data.message || "Message sent successfully!",
+        status: "success",
+        duration: 3000,
+        isClosable: true
+      });
       // Reset form
       setName("");
       setEmail("");
@@ -34,7 +47,13 @@ function Contactcard(props) {
       setMessage("");
     } catch (error) {
       console.error(error);
-      alert("Error sending message. Please try again.");
+      toast({
+        title: "Submission Error",
+        description: "Error sending message. Please try again.",
+        status: "error",
+        duration: 4000,
+        isClosable: true
+      });
     }
   };
 

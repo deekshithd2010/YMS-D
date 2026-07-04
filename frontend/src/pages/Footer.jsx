@@ -12,9 +12,13 @@ import TP1 from "../components/TP1";
 import { MinusIcon } from "@chakra-ui/icons";
 import { VscCircleLarge } from "react-icons/vsc";
 import { FaLinkedinIn, FaTwitter, FaFacebookF } from "react-icons/fa";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 function Footer() {
+  const location = useLocation();
+  if (location.pathname.startsWith("/Admin") || location.pathname.startsWith("/Instructor")) {
+    return null;
+  }
   return (
     <>
       <Flex

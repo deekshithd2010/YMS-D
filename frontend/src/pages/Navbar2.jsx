@@ -20,9 +20,14 @@ function Navbar2() {
   const [show, setShow] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isInstructor, setIsInstructor] = useState(false);
   const location = useLocation();
 
-  // Sync login status and admin privileges with route changes
+  if (location.pathname.startsWith("/Admin") || location.pathname.startsWith("/Instructor")) {
+    return null;
+  }
+
+  // Sync login status, instructor privileges, and admin privileges with route changes
   useEffect(() => {
     const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
     setIsLoggedIn(!!token);
@@ -33,12 +38,15 @@ function Navbar2() {
       })
       .then(res => {
         setIsAdmin(!!res.data.is_admin);
+        setIsInstructor(!!res.data.is_instructor);
       })
       .catch(() => {
         setIsAdmin(false);
+        setIsInstructor(false);
       });
     } else {
       setIsAdmin(false);
+      setIsInstructor(false);
     }
   }, [location]);
 
@@ -80,11 +88,14 @@ function Navbar2() {
         <Box display="grid"> <Pic src="\images\Logo.png" w="200px" h="80px" d="grid" /></Box>
         <Link to="/Instructors"><Navbutton d={{ base: 'none', sm: 'none', md: 'none', lg: "grid", xl: "grid" }} name="INSTRUCTORS" /></Link>
         <Link to="/Contact"><Navbutton d={{ base: 'none', sm: 'none', md: 'none', lg: "grid", xl: "grid" }} name="CONTACT US" /></Link>
+        {isInstructor && (
+          <Link to="/Instructor"><Navbutton d={{ base: 'none', sm: 'none', md: 'none', lg: "grid", xl: "grid" }} name="INSTRUCTOR" /></Link>
+        )}
         {isAdmin && (
           <Link to="/Admin"><Navbutton d={{ base: 'none', sm: 'none', md: 'none', lg: "grid", xl: "grid" }} name="ADMIN" /></Link>
         )}
 
-        {!isLoggedIn ? (
+        {isAdmin ? null : !isLoggedIn ? (
           <>
             <Link to="/Login">
               <Box
@@ -151,11 +162,11 @@ function Navbar2() {
                   height="45px"
                   marginBlock="17px"
                   display={{
-                    base: "none",
-                    sm: "none",
-                    md: "none",
-                    lg: "flex",
-                    xl: "flex",
+                     base: "none",
+                     sm: "none",
+                     md: "none",
+                     lg: "flex",
+                     xl: "flex",
                   }}
                 />
               </Link>
@@ -223,6 +234,7 @@ function Navbar2() {
           onClose={() => setShow(false)}
           isLoggedIn={isLoggedIn}
           isAdmin={isAdmin}
+          isInstructor={isInstructor}
           handleLogout={handleLogout}
         />
       )}

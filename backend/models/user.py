@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from datetime import datetime, timezone
 from database import Base
 
@@ -18,5 +18,7 @@ class User(Base):
     state = Column(String(50), nullable=True)
     profile_image = Column(String(255), nullable=True)
     is_admin = Column(Boolean, default=False)
+    is_instructor = Column(Boolean, default=False)
+    linked_teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
